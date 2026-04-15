@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Image Display</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        .test-section {
+            margin: 30px 0;
+            padding: 20px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+        }
+        .image-container {
+            margin: 20px 0;
+        }
+        img {
+            max-width: 400px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .url-display {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            word-break: break-all;
+            margin: 10px 0;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <h1>🖼️ Image Display Test</h1>
+    
+    <div class="test-section">
+        <h2>Test 1: Direct Backend URL</h2>
+        <p>Testing if Flask is serving files correctly at <code>/uploads/&lt;filename&gt;</code></p>
+        <div class="url-display">http://127.0.0.1:5000/uploads/1e7012901151_Screenshot_2026-03-01_225904.png</div>
+        <div class="image-container">
+            <img 
+                src="http://127.0.0.1:5000/uploads/1e7012901151_Screenshot_2026-03-01_225904.png" 
+                alt="Test Image 1"
+                onload="document.getElementById('status1').className='status success'; document.getElementById('status1').textContent='✅ Image loaded successfully!'"
+                onerror="document.getElementById('status1').className='status error'; document.getElementById('status1').textContent='❌ Failed to load image'"
+            />
+        </div>
+        <div id="status1" class="status">⏳ Loading...</div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 2: Another File</h2>
+        <div class="url-display">http://127.0.0.1:5000/uploads/4ed11255a9f2_Screenshot_2026-03-01_230852.png</div>
+        <div class="image-container">
+            <img 
+                src="http://127.0.0.1:5000/uploads/4ed11255a9f2_Screenshot_2026-03-01_230852.png" 
+                alt="Test Image 2"
+                onload="document.getElementById('status2').className='status success'; document.getElementById('status2').textContent='✅ Image loaded successfully!'"
+                onerror="document.getElementById('status2').className='status error'; document.getElementById('status2').textContent='❌ Failed to load image'"
+            />
+        </div>
+        <div id="status2" class="status">⏳ Loading...</div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 3: Fetch Files from API</h2>
+        <button onclick="fetchFiles()" style="padding: 10px 20px; font-size: 16px; cursor: pointer;">Fetch Files from API</button>
+        <div id="api-result" style="margin-top: 20px;"></div>
+    </div>
+
+    <script>
+        async function fetchFiles() {
+            const resultDiv = document.getElementById('api-result');
+            resultDiv.innerHTML = '<p>⏳ Fetching files...</p>';
+            
+            try {
+                const response = await fetch('http://127.0.0.1:5000/api/files');
+                const data = await response.json();
+                
+                if (data.success && data.data && data.data.files) {
+                    const files = data.data.files;
+                    let html = `<div class="status success">✅ Found ${files.length} files</div>`;
+                    
+                    files.slice(0, 3).forEach((file, index) => {
+                        const imageUrl = `http://127.0.0.1:5000/uploads/${file.stored_filename}`;
+                        html += `
+                            <div style="margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 4px;">
+                                <h4>File ${index + 1}: ${file.original_filename}</h4>
+                                <div class="url-display">${imageUrl}</div>
+                                <p><strong>Stored as:</strong> ${file.stored_filename}</p>
+                                <p><strong>File path:</strong> ${file.file_path}</p>
+                                <img 
+                                    src="${imageUrl}" 
+                                    alt="${file.original_filename}"
+                                    style="max-width: 300px;"
+                                    onload="this.nextElementSibling.className='status success'; this.nextElementSibling.textContent='✅ Loaded'"
+                                    onerror="this.nextElementSibling.className='status error'; this.nextElementSibling.textContent='❌ Failed'"
+                                />
+                                <div class="status">⏳ Loading...</div>
+                            </div>
+                        `;
+                    });
+                    
+                    resultDiv.innerHTML = html;
+                } else {
+                    resultDiv.innerHTML = '<div class="status error">❌ No files found or invalid response</div>';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="status error">❌ Error: ${error.message}</div>`;
+            }
+        }
+    </script>
+
+    <div class="test-section">
+        <h2>Instructions</h2>
+        <ol>
+            <li>Make sure Flask backend is running on <code>http://127.0.0.1:5000</code></li>
+            <li>Check if images load in Test 1 and Test 2</li>
+            <li>Click "Fetch Files from API" to test the complete flow</li>
+            <li>Open browser console (F12) to see any errors</li>
+        </ol>
+    </div>
+</body>
+</html>

@@ -1,0 +1,171 @@
+/* ============================================================
+   GLOBAL SKETCH / HAND-DRAWN THEME
+   ============================================================ */
+
+/* ── Reset ── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ── Root: notebook paper background + Patrick Hand font ── */
+:root {
+  font-family: 'Patrick Hand', cursive;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.6;
+  color: #1a1a1a;
+
+  /* Warm off-white base */
+  background-color: #fffef5;
+
+  /* Faint ruled notebook lines every 32px */
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 31px,
+    rgba(180, 210, 255, 0.25) 31px,
+    rgba(180, 210, 255, 0.25) 32px
+  );
+
+  /* No smooth rendering — keeps the hand-drawn feel */
+  font-synthesis: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Body ── */
+body {
+  min-height: 100vh;
+  min-width: 320px;
+  background-color: #fffef5;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 31px,
+    rgba(180, 210, 255, 0.25) 31px,
+    rgba(180, 210, 255, 0.25) 32px
+  );
+  color: #1a1a1a;
+}
+
+/* ── App shell ── */
+#app {
+  min-height: 100vh;
+  width: 100%;
+}
+
+/* ── Typography ── */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Patrick Hand', cursive;
+  color: #1a1a1a;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+p {
+  color: #1a1a1a;
+}
+
+a {
+  color: #1a1a1a;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+a:hover {
+  color: #4f46e5;
+}
+
+/* ── Buttons — sketch style ── */
+button {
+  font-family: 'Patrick Hand', cursive;
+  font-size: 14px;
+  cursor: pointer;
+  background: #ffffff;
+  color: #1a1a1a;
+  border: 2px solid #1a1a1a;
+  border-radius: 6px;
+  padding: 8px 16px;
+  box-shadow: 3px 3px 0px #1a1a1a;
+  transition: box-shadow 0.1s ease, transform 0.1s ease;
+}
+
+button:hover {
+  box-shadow: 5px 5px 0px #1a1a1a;
+  transform: translate(-1px, -1px);
+}
+
+button:active {
+  box-shadow: 1px 1px 0px #1a1a1a;
+  transform: translate(2px, 2px);
+}
+
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+/* ── Inputs ── */
+input, textarea, select {
+  font-family: 'Patrick Hand', cursive;
+  font-size: 14px;
+  color: #1a1a1a;
+  background: #ffffff;
+  border: 2px solid #1a1a1a;
+  border-radius: 6px;
+  padding: 8px 12px;
+  box-shadow: 2px 2px 0px #1a1a1a;
+  outline: none;
+  transition: box-shadow 0.1s ease;
+}
+
+input:focus, textarea:focus, select:focus {
+  box-shadow: 4px 4px 0px #1a1a1a;
+}
+
+/* ── Cards / panels — hard offset shadow, no gradient ── */
+.card, [class*="card"], [class*="-panel"], [class*="-box"] {
+  background: #ffffff;
+  border: 2px solid #1a1a1a;
+  border-radius: 8px;
+  box-shadow: 4px 4px 0px #1a1a1a;
+}
+
+/* ── Kill ALL gradients, smooth shadows, glassmorphism globally ── */
+* {
+  /* Remove any backdrop blur */
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Override any inline or component-level smooth box-shadows
+   with the sketch hard shadow. Components that need NO shadow
+   should set box-shadow: none explicitly in their own scoped CSS. */
+
+/* ── Scrollbars — minimal ── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #999;
+}
+
+/* ── Selection highlight ── */
+::selection {
+  background: #fff59d;
+  color: #1a1a1a;
+}

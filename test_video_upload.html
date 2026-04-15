@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Video Upload</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        .upload-section {
+            margin: 30px 0;
+            padding: 20px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+        }
+        input[type="file"] {
+            margin: 10px 0;
+        }
+        button {
+            padding: 12px 24px;
+            font-size: 16px;
+            background: #4F46E5;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #4338CA;
+        }
+        button:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+        .status {
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .info {
+            background: #e0f2fe;
+            color: #075985;
+        }
+        .success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        .progress {
+            width: 100%;
+            height: 30px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #4F46E5 0%, #7C3AED 100%);
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎥 Video Upload Test</h1>
+    
+    <div class="upload-section">
+        <h2>Upload Video File</h2>
+        <p>This test uploads a video to <code>/api/files/upload</code> endpoint</p>
+        
+        <input type="file" id="videoFile" accept="video/mp4,video/avi,video/mov" />
+        <br><br>
+        <button onclick="uploadVideo()" id="uploadBtn">Upload Video</button>
+        
+        <div id="progress" class="progress" style="display: none;">
+            <div id="progressBar" class="progress-bar">0%</div>
+        </div>
+        
+        <div id="status"></div>
+    </div>
+
+    <div class="upload-section">
+        <h2>Instructions</h2>
+        <ol>
+            <li>Make sure Flask backend is running on <code>http://127.0.0.1:5000</code></li>
+            <li><strong>IMPORTANT:</strong> Restart Flask backend after config change</li>
+            <li>Select a video file (MP4, AVI, or MOV)</li>
+            <li>Click "Upload Video"</li>
+            <li>Watch the progress bar and status messages</li>
+        </ol>
+        
+        <div class="status info">
+            <strong>Config Changes Made:</strong>
+            - MAX_CONTENT_LENGTH increased from 16MB to 100MB
+            - You MUST restart Flask backend for this to take effect
+            
+            <strong>To restart Flask:</strong>
+            1. Stop the current Flask process (Ctrl+C)
+            2. Run: cd backend && python run.py
+        </div>
+    </div>
+
+    <script>
+        async function uploadVideo() {
+            const fileInput = document.getElementById('videoFile');
+            const statusDiv = document.getElementById('status');
+            const uploadBtn = document.getElementById('uploadBtn');
+            const progressDiv = document.getElementById('progress');
+            const progressBar = document.getElementById('progressBar');
+            
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                statusDiv.innerHTML = '<div class="status error">❌ Please select a video file</div>';
+                return;
+            }
+            
+            // Show file info
+            const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
+            statusDiv.innerHTML = `<div class="status info">📁 File: ${file.name}\n📊 Size: ${fileSizeMB} MB\n📹 Type: ${file.type}\n\n⏳ Uploading...</div>`;
+            
+            uploadBtn.disabled = true;
+            progressDiv.style.display = 'block';
+            
+            try {
+                const formData = new FormData();
+                formData.append('file', file);
+                
+                const xhr = new XMLHttpRequest();
+                
+                // Track upload progress
+                xhr.upload.addEventListener('progress', (e) => {
+                    if (e.lengthComputable) {
+                        const percentComplete = Math.round((e.loaded / e.total) * 100);
+                        progressBar.style.width = percentComplete + '%';
+                        progressBar.textContent = percentComplete + '%';
+                    }
+                });
+                
+                xhr.addEventListener('load', () => {
+                    if (xhr.status === 201) {
+                        const response = JSON.parse(xhr.responseText);
+                        statusDiv.innerHTML = `<div class="status success">✅ Upload successful!\n\n${JSON.stringify(response, null, 2)}</div>`;
+                    } else {
+                        const response = JSON.parse(xhr.responseText);
+                        statusDiv.innerHTML = `<div class="status error">❌ Upload failed (${xhr.status})\n\n${JSON.stringify(response, null, 2)}</div>`;
+                    }
+                    uploadBtn.disabled = false;
+                    progressDiv.style.display = 'none';
+                });
+                
+                xhr.addEventListener('error', () => {
+                    statusDiv.innerHTML = `<div class="status error">❌ Network error occurred\n\nPossible causes:\n- Flask backend not running\n- CORS issues\n- File size exceeds server limit\n- Connection timeout</div>`;
+                    uploadBtn.disabled = false;
+                    progressDiv.style.display = 'none';
+                });
+                
+                xhr.addEventListener('abort', () => {
+                    statusDiv.innerHTML = `<div class="status error">❌ Upload aborted\n\nThis usually means:\n- File size exceeds MAX_CONTENT_LENGTH\n- Server rejected the request\n- Connection timeout</div>`;
+                    uploadBtn.disabled = false;
+                    progressDiv.style.display = 'none';
+                });
+                
+                xhr.open('POST', 'http://127.0.0.1:5000/api/files/upload');
+                xhr.send(formData);
+                
+            } catch (error) {
+                statusDiv.innerHTML = `<div class="status error">❌ Error: ${error.message}</div>`;
+                uploadBtn.disabled = false;
+                progressDiv.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

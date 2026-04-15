@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test API Calls</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 30px 0;
+            padding: 20px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+        }
+        .result {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            margin: 10px 0;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            background: #4F46E5;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .success { border-left: 4px solid #10b981; background: #d1fae5; }
+        .error { border-left: 4px solid #ef4444; background: #fee2e2; }
+    </style>
+</head>
+<body>
+    <h1>🔍 API Calls Test</h1>
+    
+    <div class="test-section">
+        <h2>Test 1: GET /api/files</h2>
+        <p>This should return ALL uploaded files (images + videos)</p>
+        <button onclick="testFiles()">Test Files API</button>
+        <div id="filesResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 2: GET /api/videos</h2>
+        <p>This only returns PROCESSED videos (after calling /api/videos/process)</p>
+        <button onclick="testVideos()">Test Videos API</button>
+        <div id="videosResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 3: Filter Files by Type</h2>
+        <button onclick="testImageFiles()">Get Images Only</button>
+        <button onclick="testVideoFiles()">Get Videos Only</button>
+        <div id="filterResult" class="result"></div>
+    </div>
+
+    <script>
+        async function testFiles() {
+            const resultDiv = document.getElementById('filesResult');
+            resultDiv.textContent = '⏳ Testing GET /api/files...';
+            
+            try {
+                const response = await fetch('http://127.0.0.1:5000/api/files');
+                const data = await response.json();
+                
+                resultDiv.className = 'result ' + (response.ok ? 'success' : 'error');
+                
+                let output = `Status: ${response.status}\n\n`;
+                output += JSON.stringify(data, null, 2);
+                
+                if (data.success && data.data && data.data.files) {
+                    output += `\n\n📊 SUMMARY:\n`;
+                    output += `Total files: ${data.data.files.length}\n`;
+                    
+                    const images = data.data.files.filter(f => f.file_type === 'image');
+                    const videos = data.data.files.filter(f => f.file_type === 'video');
+                    
+                    output += `Images: ${images.length}\n`;
+                    output += `Videos: ${videos.length}\n\n`;
+                    
+                    output += `📁 FILES:\n`;
+                    data.data.files.forEach((file, i) => {
+                        output += `${i + 1}. ${file.original_filename} (${file.file_type})\n`;
+                        output += `   ID: ${file.id}, Stored: ${file.stored_filename}\n`;
+                    });
+                }
+                
+                resultDiv.textContent = output;
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `❌ Error: ${error.message}`;
+            }
+        }
+
+        async function testVideos() {
+            const resultDiv = document.getElementById('videosResult');
+            resultDiv.textContent = '⏳ Testing GET /api/videos...';
+            
+            try {
+                const response = await fetch('http://127.0.0.1:5000/api/videos');
+                const data = await response.json();
+                
+                resultDiv.className = 'result ' + (response.ok ? 'success' : 'error');
+                
+                let output = `Status: ${response.status}\n\n`;
+                output += JSON.stringify(data, null, 2);
+                
+                if (data.success && data.data && data.data.videos) {
+                    output += `\n\n📊 SUMMARY:\n`;
+                    output += `Processed videos: ${data.data.videos.length}\n`;
+                    
+                    if (data.data.videos.length === 0) {
+                        output += `\n⚠️ No processed videos found!\n`;
+                        output += `Videos must be processed via POST /api/videos/process first.\n`;
+                    }
+                }
+                
+                resultDiv.textContent = output;
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `❌ Error: ${error.message}`;
+            }
+        }
+
+        async function testImageFiles() {
+            const resultDiv = document.getElementById('filterResult');
+            resultDiv.textContent = '⏳ Testing GET /api/files?type=image...';
+            
+            try {
+                const response = await fetch('http://127.0.0.1:5000/api/files?type=image');
+                const data = await response.json();
+                
+                resultDiv.className = 'result ' + (response.ok ? 'success' : 'error');
+                resultDiv.textContent = `Images Only:\n\n${JSON.stringify(data, null, 2)}`;
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `❌ Error: ${error.message}`;
+            }
+        }
+
+        async function testVideoFiles() {
+            const resultDiv = document.getElementById('filterResult');
+            resultDiv.textContent = '⏳ Testing GET /api/files?type=video...';
+            
+            try {
+                const response = await fetch('http://127.0.0.1:5000/api/files?type=video');
+                const data = await response.json();
+                
+                resultDiv.className = 'result ' + (response.ok ? 'success' : 'error');
+                resultDiv.textContent = `Videos Only:\n\n${JSON.stringify(data, null, 2)}`;
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `❌ Error: ${error.message}`;
+            }
+        }
+
+        // Auto-run the files test
+        window.onload = () => testFiles();
+    </script>
+</body>
+</html>

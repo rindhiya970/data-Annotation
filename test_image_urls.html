@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Image URLs</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 30px 0;
+            padding: 20px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+        }
+        .image-test {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .url-display {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            margin: 10px 0;
+            word-break: break-all;
+        }
+        img {
+            max-width: 200px;
+            border: 1px solid #ccc;
+            margin: 10px 0;
+        }
+        .status {
+            padding: 8px;
+            border-radius: 4px;
+            margin: 5px 0;
+        }
+        .success { background: #d1fae5; color: #065f46; }
+        .error { background: #fee2e2; color: #991b1b; }
+    </style>
+</head>
+<body>
+    <h1>🖼️ Image URL Test</h1>
+    
+    <div class="test-section">
+        <h2>Test Image URLs</h2>
+        <p>This will test different URL formats to see which ones work</p>
+        <button onclick="testImageUrls()">Test Image URLs</button>
+        <div id="results"></div>
+    </div>
+
+    <script>
+        // Simulate the getFileUrl function from config/api.js
+        function getFileUrl(storedFilename) {
+            if (!storedFilename) return '';
+            
+            const API_BASE_URL = 'http://127.0.0.1:5000/api';
+            const baseUrl = API_BASE_URL.replace('/api', '');
+            
+            return `${baseUrl}/uploads/${storedFilename}`;
+        }
+
+        // Simulate the getMediaUrl function from MediaLibraryView
+        function getMediaUrl(filePath) {
+            if (!filePath) return '/placeholder-image.jpg';
+            if (filePath.startsWith('http')) return filePath;
+            
+            const filename = filePath.split('\\').pop().split('/').pop();
+            return getFileUrl(filename);
+        }
+
+        async function testImageUrls() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<p>⏳ Testing image URLs...</p>';
+            
+            try {
+                // First get the files from API
+                const response = await fetch('http://127.0.0.1:5000/api/files');
+                const data = await response.json();
+                
+                if (!data.success || !data.data || !data.data.files) {
+                    resultsDiv.innerHTML = '<p class="status error">❌ No files found in API response</p>';
+                    return;
+                }
+                
+                const files = data.data.files;
+                let html = `<p class="status success">✅ Found ${files.length} files</p>`;
+                
+                // Test each file
+                files.slice(0, 5).forEach((file, index) => {
+                    const originalUrl = getMediaUrl(file.file_path);
+                    const directUrl = `http://127.0.0.1:5000/uploads/${file.stored_filename}`;
+                    
+                    html += `
+                        <div class="image-test">
+                            <h4>File ${index + 1}: ${file.original_filename}</h4>
+                            <p><strong>File Type:</strong> ${file.file_type}</p>
+                            <p><strong>Stored Filename:</strong> ${file.stored_filename}</p>
+                            <p><strong>File Path:</strong> ${file.file_path}</p>
+                            
+                            <div>
+                                <strong>Generated URL (getMediaUrl):</strong>
+                                <div class="url-display">${originalUrl}</div>
+                                <img 
+                                    src="${originalUrl}" 
+                                    alt="Test 1"
+                                    onload="this.nextElementSibling.className='status success'; this.nextElementSibling.textContent='✅ Loaded successfully'"
+                                    onerror="this.nextElementSibling.className='status error'; this.nextElementSibling.textContent='❌ Failed to load'"
+                                />
+                                <div class="status">⏳ Loading...</div>
+                            </div>
+                            
+                            <div>
+                                <strong>Direct URL:</strong>
+                                <div class="url-display">${directUrl}</div>
+                                <img 
+                                    src="${directUrl}" 
+                                    alt="Test 2"
+                                    onload="this.nextElementSibling.className='status success'; this.nextElementSibling.textContent='✅ Loaded successfully'"
+                                    onerror="this.nextElementSibling.className='status error'; this.nextElementSibling.textContent='❌ Failed to load'"
+                                />
+                                <div class="status">⏳ Loading...</div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                resultsDiv.innerHTML = html;
+                
+            } catch (error) {
+                resultsDiv.innerHTML = `<p class="status error">❌ Error: ${error.message}</p>`;
+            }
+        }
+
+        // Auto-run test
+        window.onload = () => testImageUrls();
+    </script>
+</body>
+</html>

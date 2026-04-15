@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Direct Upload Test</title>
+</head>
+<body>
+    <h1>Direct Upload Test (No Vue/Axios)</h1>
+    <input type="file" id="fileInput" accept="image/*">
+    <button onclick="uploadFile()">Upload</button>
+    <div id="result"></div>
+
+    <script>
+        async function uploadFile() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                alert('Please select a file');
+                return;
+            }
+
+            console.log('File selected:', file.name);
+            console.log('File type:', file.type);
+            console.log('File size:', file.size);
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            console.log('FormData created');
+            for (let pair of formData.entries()) {
+                console.log('FormData entry:', pair[0], pair[1]);
+            }
+
+            try {
+                const response = await fetch('http://127.0.0.1:5000/api/files/upload', {
+                    method: 'POST',
+                    body: formData
+                    // Don't set Content-Type - let browser handle it
+                });
+
+                console.log('Response status:', response.status);
+                const data = await response.json();
+                console.log('Response data:', data);
+
+                document.getElementById('result').innerHTML = 
+                    '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+
+                if (response.ok) {
+                    alert('Upload successful!');
+                } else {
+                    alert('Upload failed: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Upload error:', error);
+                alert('Upload error: ' + error.message);
+            }
+        }
+    </script>
+</body>
+</html>
