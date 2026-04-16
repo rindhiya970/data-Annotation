@@ -27,11 +27,9 @@
           :title="pendingCount > 0 ? `${pendingCount} pending task${pendingCount > 1 ? 's' : ''}` : 'No pending tasks'"
           @click="$router.push('/tasks')"
         >
-          <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
-            <path d="M15 6C15 4.93913 14.5786 3.92172 13.8284 3.17157C13.0783 2.42143 12.0609 2 11 2C9.93913 2 8.92172 2.42143 8.17157 3.17157C7.42143 3.92172 7 4.93913 7 6C7 11 5 13 5 13H17C17 13 15 11 15 6Z"
-                  stroke="#1a1a1a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M12.73 17C12.5542 17.3031 12.3019 17.5547 11.9982 17.7295C11.6946 17.9044 11.3504 17.9965 11 17.9965C10.6496 17.9965 10.3054 17.9044 10.0018 17.7295C9.69807 17.5547 9.44578 17.3031 9.27 17"
-                  stroke="#1a1a1a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M18 8C18 6.4087 17.3679 4.88258 16.2426 3.75736C15.1174 2.63214 13.5913 2 12 2C10.4087 2 8.88258 2.63214 7.75736 3.75736C6.63214 4.88258 6 6.4087 6 8C6 15 3 17 3 17H21C21 17 18 15 18 8Z" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M13.73 21C13.5542 21.3031 13.3019 21.5547 12.9982 21.7295C12.6946 21.9044 12.3504 21.9965 12 21.9965C11.6496 21.9965 11.3054 21.9044 11.0018 21.7295C10.6981 21.5547 10.4458 21.3031 10.27 21" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
           <span v-if="pendingCount > 0" class="hdr-badge">{{ pendingCount }}</span>
         </button>
