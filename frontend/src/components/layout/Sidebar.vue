@@ -209,7 +209,7 @@ const handleLogout = () => {
 
 .sb-item:hover {
   border: 2px dashed #1a1a1a;
-  color: #1a1a1a;
+  color: #0b0a0aff;
 }
 
 .sb-item.router-link-active,
