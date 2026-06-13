@@ -3,31 +3,31 @@
   <nav class="navigation">
     <div class="nav-header">
       <div class="logo">
-        <span class="logo-icon">📊</span>
+        <span class="logo-icon"></span>
         <span class="logo-text">Annotator</span>
       </div>
     </div>
     
     <div class="nav-links">
       <router-link to="/dashboard" class="nav-link">
-        <span class="nav-icon">🏠</span>
+        <span class="nav-icon"></span>
         <span class="nav-text">Dashboard</span>
       </router-link>
       
       <router-link to="/upload" class="nav-link">
-        <span class="nav-icon">📤</span>
+        <span class="nav-icon"></span>
         <span class="nav-text">Upload</span>
       </router-link>
       
       <div class="nav-section-title">Media</div>
       
       <router-link to="/files" class="nav-link">
-        <span class="nav-icon">🖼️</span>
+        <span class="nav-icon"></span>
         <span class="nav-text">Files</span>
       </router-link>
       
       <router-link to="/videos" class="nav-link">
-        <span class="nav-icon">🎬</span>
+        <span class="nav-icon"></span>
         <span class="nav-text">Videos</span>
       </router-link>
     </div>
