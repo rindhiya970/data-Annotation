@@ -1,7 +1,7 @@
 <!-- src/components/common/ErrorAlert.vue -->
 <template>
   <div v-if="message" class="error-alert">
-    <span class="error-icon">⚠️</span>
+    <span class="error-icon"></span>
     <span class="error-message">{{ message }}</span>
     <button v-if="dismissible" @click="$emit('dismiss')" class="dismiss-btn">
       ×
