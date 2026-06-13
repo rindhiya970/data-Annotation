@@ -198,7 +198,7 @@ const handleLogout = () => {
   gap: 10px;
   padding: 9px 10px;
   border-radius: 7px;
-  color: #444;
+  color: #4a4747ff;
   text-decoration: none;
   font-size: 14px;
   font-weight: 500;
